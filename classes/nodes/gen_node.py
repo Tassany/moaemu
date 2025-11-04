@@ -29,6 +29,7 @@ class GenericNode():
   dump_duration: int = None
   mobility: str = None
   network: List[str] = None
+  docker_image: str = None  # Docker image name for Docker nodes
   max_position: List[float] = field(default_factory=lambda: [5000,5000,5000])
   velocity: List[float] = None
   time_thread: threading.Thread = None

@@ -15,6 +15,7 @@ from classes.bus.bus import Bus
 #Core libs
 from core.emulator.data import IpPrefixes, NodeOptions
 from core.nodes.base import CoreNode
+from core.nodes.docker import DockerNode
 from core.nodes.network import WlanNode
 from core.location.mobility import BasicRangeModel
 from classes.auxiliar.virtual_gps import VirtualGPS
@@ -104,14 +105,17 @@ class Scenario():
       self.prefixes[network['name']] = IpPrefixes(network['prefix'])
 
   def load_nodes(self, scenario_json):
-    """_summary_
+    """Load nodes from scenario JSON, including Docker nodes
 
     Args:
-        scenario_json (_type_): _description_
+        scenario_json (_type_): scenario configuration
     """
     nodes = scenario_json['nodes']
     for node in nodes:
       try: 
+        # Get docker_image if specified, otherwise None
+        docker_image = node['extra'].get('docker_image', None) if 'extra' in node else None
+        
         self.mace_nodes.append(GenericNode(
           coordinates = [node['settings']['x'], node['settings']['y'], 0],
           tagname = node['settings']['type'] + str(node['settings']['_id']),
@@ -126,6 +130,7 @@ class Scenario():
           dump_duration = int(node['extra']['dump']['duration']),
           mobility = node['extra']['mobility'],
           network = node['extra']['network'],
+          docker_image = docker_image,
           max_position = None if node['extra']['mobility'] == "none" else [node['extra']['mobility']['zone_x'], node['extra']['mobility']['zone_y'], node['extra']['mobility']['zone_z']],
           velocity = None if node['extra']['mobility'] == "none" else [node['extra']['mobility']['velocity_lower'], node['extra']['mobility']['velocity_upper']]
         ))
@@ -133,14 +138,29 @@ class Scenario():
         traceback.print_exc()
 
   def setup_nodes(self, session):
-    """_summary_
+    """Setup nodes in the CORE session, supporting both regular and Docker nodes
 
     Args:
-        session (_type_): _description_
+        session (_type_): CORE session object
     """
     for node in self.mace_nodes:
-      node.options = NodeOptions(name=node.name, x=node.coordinates[0], y=node.coordinates[1])
-      core_node = session.add_node(CoreNode, options=node.options)
+      # Check if this is a Docker node
+      is_docker = hasattr(node, 'docker_image') and node.docker_image is not None
+      
+      if is_docker:
+        # Create Docker node with specified image
+        node.options = NodeOptions(
+          name=node.name, 
+          x=node.coordinates[0], 
+          y=node.coordinates[1],
+          image=node.docker_image
+        )
+        core_node = session.add_node(DockerNode, options=node.options)
+      else:
+        # Create regular CORE node
+        node.options = NodeOptions(name=node.name, x=node.coordinates[0], y=node.coordinates[1])
+        core_node = session.add_node(CoreNode, options=node.options)
+      
       node.corenode = core_node
       node.gps = VirtualGPS(node.name, node.tag_number)
       node.gps.start()
