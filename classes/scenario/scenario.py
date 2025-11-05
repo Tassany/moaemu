@@ -43,6 +43,18 @@ class Scenario():
     self.fixed_wlan = WlanNode
     self.mobile_wlan = WlanNode
     self.cwd = os.getcwd() #TODO, create an option so that we don't need this
+    
+    # Initialize essential attributes to prevent AttributeError
+    self.mace_nodes = []
+    self.wlans = {}
+    self.networks = {}
+    self.prefixes = {}
+    self.etcd_cluster = {}
+    self.report_folder = "./reports"  # Default value, will be overridden by setup()
+    self.running = False
+    self.runtime = 0
+    self.simulation_time = 0
+    self.disks_folder = "/mnt/pymace/"
 
     #self._setup(scenario_json)
 
@@ -191,8 +203,14 @@ class Scenario():
     print("scenario> #################################################STOP###################################################")
     self.running = False
     for node in self.mace_nodes:
-      node.tracer.shutdown()
-      node.stop()
+      try:
+        node.tracer.shutdown()
+      except:
+        pass
+      try:
+        node.stop()
+      except:
+        pass
 
   def setup_links(self, session):
     """_summary_

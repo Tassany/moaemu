@@ -1,0 +1,194 @@
+{
+  "nodes": [
+    {
+      "name": "uav0",
+      "settings": {
+        "_id": 0,
+        "x": 270,
+        "y": 210,
+        "fill": "#1100FF",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 6,
+        "shadowColor": "black",
+        "type": "node",
+        "range": 120
+      },
+      "type": "UTM",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 35,
+          "duration": 15
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 20 && echo \"[UAV0] Waiting for Apache server to start...\" && sleep 10 && echo \"[UAV0] Testing connectivity with 10.0.0.4...\" && ping -c 2 10.0.0.4 && echo \"\" && echo \"[UAV0] Testing port 80 with netcat...\" && nc -zv 10.0.0.4 80 && echo \"\" && echo \"[UAV0] Making HTTP request to 10.0.0.4...\" && while true; do RESPONSE=$(curl -s -w \"\\nHTTP_CODE:%{http_code}\" http://10.0.0.4 2>&1); if echo \"$RESPONSE\" | grep -q \"HTTP_CODE:200\"; then echo \"$RESPONSE\" | grep -v \"HTTP_CODE\" && echo \" - [UAV0] ✓ Response received successfully!\"; else echo \" - [UAV0] ✗ Request error - Details: $RESPONSE\"; fi; sleep 10; done'"]
+    },
+    {
+      "name": "uav1",
+      "settings": {
+        "_id": 1,
+        "x": 254,
+        "y": 247,
+        "fill": "#1100FF",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 6,
+        "shadowColor": "black",
+        "type": "node",
+        "range": 120
+      },
+      "type": "UTM",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 35,
+          "duration": 15
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 20 && echo \"[UAV1] Waiting for Apache server to start...\" && sleep 12 && echo \"[UAV1] Testing connectivity with 10.0.0.4...\" && ping -c 2 10.0.0.4 && echo \"\" && echo \"[UAV1] Testing port 80 with netcat...\" && nc -zv 10.0.0.4 80 && echo \"\" && echo \"[UAV1] Making HTTP request to 10.0.0.4...\" && while true; do RESPONSE=$(curl -s -w \"\\nHTTP_CODE:%{http_code}\" http://10.0.0.4 2>&1); if echo \"$RESPONSE\" | grep -q \"HTTP_CODE:200\"; then echo \"$RESPONSE\" | grep -v \"HTTP_CODE\" && echo \" - [UAV1] ✓ Response received successfully!\"; else echo \" - [UAV1] ✗ Request error - Details: $RESPONSE\"; fi; sleep 12; done'"]
+    },
+    {
+      "name": "uav2",
+      "settings": {
+        "_id": 2,
+        "x": 198,
+        "y": 245,
+        "fill": "#1100FF",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 6,
+        "shadowColor": "black",
+        "type": "node",
+        "range": 120
+      },
+      "type": "UTM",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 35,
+          "duration": 15
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 20 && echo \"[UAV2] Waiting for Apache server to start...\" && sleep 14 && echo \"[UAV2] Testing connectivity with 10.0.0.4...\" && ping -c 2 10.0.0.4 && echo \"\" && echo \"[UAV2] Testing port 80 with netcat...\" && nc -zv 10.0.0.4 80 && echo \"\" && echo \"[UAV2] Making HTTP request to 10.0.0.4...\" && while true; do RESPONSE=$(curl -s -w \"\\nHTTP_CODE:%{http_code}\" http://10.0.0.4 2>&1); if echo \"$RESPONSE\" | grep -q \"HTTP_CODE:200\"; then echo \"$RESPONSE\" | grep -v \"HTTP_CODE\" && echo \" - [UAV2] ✓ Response received successfully!\"; else echo \" - [UAV2] ✗ Request error - Details: $RESPONSE\"; fi; sleep 15; done'"]
+    },
+    {
+      "name": "apache-server",
+      "settings": {
+        "_id": 3,
+        "x": 230,
+        "y": 280,
+        "fill": "#FF0000",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 8,
+        "shadowColor": "black",
+        "type": "server",
+        "range": 120
+      },
+      "type": "DOCKER",
+      "extra": {
+        "docker_image": "core-httpd:latest",
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 0,
+          "duration": 0
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'mkdir -p /usr/local/apache2/htdocs && echo \"<html><head><title>Apache Server</title></head><body><h1>Hello from Apache in CORE!</h1><p>Server is running correctly at 10.0.0.4</p></body></html>\" > /usr/local/apache2/htdocs/index.html && echo \"[SERVER] File created, starting server...\" && python3 -m http.server 80 --directory /usr/local/apache2/htdocs'"]
+    }
+  ],
+  "settings": {
+    "omnet": "False",
+    "core": "True",
+    "dump": "False",
+    "number_of_nodes": 7,
+    "start_delay": 5,
+    "username": "mace",
+    "disks_folder": "/mnt/pymace/",
+    "report_folder": "/home/mace/temp/reports/",
+    "runtime": 100,
+    "emane_location": [47.57917, -122.13232, 2.0],
+    "emane_scale": 150
+  },
+  "networks": [
+    {
+      "name": "fixed",
+      "prefix": "10.0.0.0/24",
+      "routing": "none",
+      "settings": {
+        "range": "160",
+        "bandwidth": "433000000",
+        "delay": "3000",
+        "jitter": "0",
+        "error": "0",
+        "emane": "False"
+      }
+    },
+    {
+      "name" : "mobile",
+      "prefix" : "10.1.0.0/24",
+      "routing": "none",
+      "settings": {
+          "range": "160",
+          "bandwidth": "433300000",
+          "delay": "3000",
+          "jitter": "0",
+          "error": "0",
+          "emane": "False"
+      }
+    }
+  ]
+}
