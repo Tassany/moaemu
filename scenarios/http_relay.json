@@ -1,0 +1,143 @@
+{
+  "nodes": [
+    {
+      "name": "client",
+      "settings": {
+        "_id": 0,
+        "x": 100,
+        "y": 300,
+        "fill": "#1100FF",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 6,
+        "shadowColor": "black",
+        "type": "client",
+        "range": 120
+      },
+      "type": "UTM",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 0,
+          "duration": 0
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 30 && echo \"=== HTTP CLIENT ===\" && echo \"My IP:\" && hostname -I && echo \"\" && echo \"Adding route via relay...\" && ip route add 10.0.0.3 via 10.0.0.2 dev eth0 2>/dev/null || echo \"(route already exists)\" && echo \"\" && echo \"Current routes:\" && ip route show && echo \"\" && echo \"Checking direct connectivity with server 10.0.0.3...\" && ping -c 2 -W 2 10.0.0.3 && echo \"✓ Direct reach (without relay)\" || echo \"✗ Out of range - RELAY REQUIRED\" && echo \"\" && echo \"Testing server 10.0.0.3:8080 (via relay 10.0.0.2)...\" && echo \"\" && while true; do RESP=$(curl -s -w \"CODE:%{http_code}\" http://10.0.0.3:8080 2>&1); CODE=$(echo \"$RESP\" | grep -o \"CODE:[0-9]*\" | cut -d: -f2); if [ \"$CODE\" = \"200\" ]; then echo \"[$(date +%T)] ✓ HTTP 200 via Relay!\"; echo \"$RESP\" | grep -v CODE | head -n 2; else echo \"[$(date +%T)] ✗ HTTP Error $CODE\"; fi; echo \"\"; sleep 10; done'"]
+    },
+    {
+      "name": "relay",
+      "settings": {
+        "_id": 1,
+        "x": 300,
+        "y": 300,
+        "fill": "#FFFF00",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 7,
+        "shadowColor": "black",
+        "type": "relay",
+        "range": 120
+      },
+      "type": "DEFAULT",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "True",
+          "delay": 0,
+          "duration": 100
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 20 && echo \"=== RELAY ===\" && echo \"Configuring forwarding...\" && sysctl -w net.ipv4.ip_forward=1 > /dev/null && iptables -P INPUT ACCEPT && iptables -P OUTPUT ACCEPT && iptables -P FORWARD ACCEPT &&  iptables -t nat -F && iptables -A FORWARD -s 10.0.0.0/24 -d 10.0.0.0/24 -j ACCEPT && echo \"✓ IP Forwarding active\" && echo \"✓ Firewall configured (ACCEPT + FORWARD)\" && echo \"\" && echo \"My IP:\" && hostname -I && echo \"\" && echo \"Testing connectivity:\" && echo -n \"  Ping client 10.0.0.1: \" && ping -c 1 -W 1 10.0.0.1 > /dev/null && echo \"✓\" || echo \"✗\" && echo -n \"  Ping server 10.0.0.3: \" && ping -c 1 -W 1 10.0.0.3 > /dev/null && echo \"✓\" || echo \"✗\" && echo \"\" && echo \"Routes:\" && ip route show && echo \"\" && echo \"iptables FORWARD rules:\" && iptables -L FORWARD -n -v && echo \"\" && echo \"Monitoring HTTP traffic (port 8080):\" && tcpdump -i any -n -l port 8080'"]
+    },
+    {
+      "name": "server",
+      "settings": {
+        "_id": 2,
+        "x": 500,
+        "y": 300,
+        "fill": "#00FF00",
+        "stroke": "black",
+        "strokeWidth": 0,
+        "shadowBlur": 1,
+        "shadowOffset": {
+          "x": 2,
+          "y": 2
+        },
+        "shadowOpacity": 0.2,
+        "opacity": 0.8,
+        "draggable": true,
+        "radius": 8,
+        "shadowColor": "black",
+        "type": "server",
+        "range": 120
+      },
+      "type": "DEFAULT",
+      "extra": {
+        "disks": "False",
+        "dump": {
+          "start": "False",
+          "delay": 0,
+          "duration": 0
+        },
+        "mobility": "none",
+        "network": [
+          "fixed"
+        ]
+      },
+      "function": ["xterm -hold -e bash -c 'sleep 10 && echo \"=== HTTP SERVER ===\" && mkdir -p /tmp/www && echo \"<html><head><title>Server via Relay </title></head><body><h1>✓ HTTP Server OK!</h1><p>Request passed through Relay</p><p>Time: $(date)</p></body></html>\" > /tmp/www/index.html && echo \"✓ HTML file created\" && echo \"\" && echo \"Adding return route via relay...\" && ip route add 10.0.0.1 via 10.0.0.2 dev eth0 2>/dev/null || echo \"(route already exists)\" && echo \"\" && echo \"My IP:\" && hostname -I && echo \"\" && echo \"Current routes:\" && ip route show && echo \"\" && echo \"Starting HTTP server on port 8080...\" && echo \"=======================================\" && cd /tmp/www && python3 -m http.server 8080'"]
+    }
+  ],
+  "settings": {
+    "omnet": "False",
+    "core": "True",
+    "dump": "False",
+    "number_of_nodes": 3,
+    "start_delay": 5,
+    "username": "mace",
+    "disks_folder": "/mnt/pymace/",
+    "report_folder": "/home/mace/temp/reports/",
+    "runtime": 100,
+    "emane_location": [47.57917, -122.13232, 2.0],
+    "emane_scale": 150
+  },
+  "networks": [
+    {
+      "name": "fixed",
+      "prefix": "10.0.0.0/24",
+      "routing": "none",
+      "settings": {
+        "range": "250",
+        "bandwidth": "100000000",
+        "delay": "2000",
+        "jitter": "0",
+        "error": "0",
+        "emane": "False"
+      }
+    }
+  ]
+}
